@@ -11,7 +11,16 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: {
+          DEFAULT: "#BFE3FC",
+          light: "#D4EDFD",
+          dark: "#90D1FB",
+        }
       },
+      fontFamily: {
+        'bold': ['DNFBitBit', 'sans-serif'],
+        'light': ['Moneygraphy', 'sans-serif'],
+      }
     },
   },
   plugins: [],
