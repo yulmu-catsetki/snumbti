@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState,useEffect, useRef } from 'react';
 import Image from 'next/image';
-import html2canvas from 'html2canvas';
+
+
 export interface ClubType {
   title: string;
   description: string;
@@ -383,94 +384,40 @@ interface ResultsProps {
 
 export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
   const [isSharing, setIsSharing] = useState(false);
-  const resultRef = useRef<HTMLDivElement>(null);
   const result = clubTypes[mbtiResult];
-
-  if (!result) {
-    return <div className="text-center">결과를 분석중입니다...</div>;
-  }
-
-  const shareToInstagram = async () => {
-    if (!resultRef.current) return;
-
+  const handleShare = async () => {
+    setIsSharing(true);
+    
     try {
-      setIsSharing(true);
-
-      // Get the result container
-      const resultElement = resultRef.current;
-
-      // Use html2canvas to convert the div to a canvas
-      const canvas = await html2canvas(resultElement, {
-        scale: 2, // Higher scale for better quality
-        useCORS: true, // Allow cross-origin images
-        allowTaint: true,
-        backgroundColor: "#ffffff"
-      });
-
-      // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((blob) => {
-          resolve(blob as Blob);
-        }, 'image/png', 1.0);
-      });
-
-      // Create a file from the blob
-      const file = new File([blob], 'mbti-result.png', { type: 'image/png' });
-
-      // Create a FileReader to get the data URL
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        const dataUrl = reader.result as string;
-
-        // For mobile devices, attempt to use Web Share API if available
-        if (navigator.share) {
-          navigator.share({
-            files: [file],
-            title: '나의 동아리 유형은?',
-            text: `나는 ${result.title} 유형이에요!`
-          }).catch(error => {
-            console.error('Error sharing', error);
-            // Fallback to Instagram direct link
-            openInstagram(dataUrl);
-          });
-        } else {
-          // Fallback to Instagram direct link
-          openInstagram(dataUrl);
-        }
-
+      // Define the image URL based on the MBTI result
+      const imageUrl = `/img/result/결과_${mbtiResult.toLowerCase()}.png`;
+      
+      // Create a link element to trigger the download
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `서울대_동아리_MBTI.png`;
+      document.body.appendChild(link);
+      
+      // Trigger the download
+      link.click();
+      
+      // Clean up the link element
+      document.body.removeChild(link);
+      
+      // Short delay before opening Instagram
+      setTimeout(() => {
+        // Open Instagram
+        window.open('https://www.instagram.com/create/story', '_blank');
         setIsSharing(false);
-      };
+      }, 500);
+      
     } catch (error) {
-      console.error('Error generating image:', error);
+      console.error('Error sharing result:', error);
       setIsSharing(false);
     }
   };
-
-  // Function to open Instagram with the image
-  const openInstagram = (dataUrl: string) => {
-    // Create a temporary link to download the image (some mobile browsers need this step)
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = 'mbti-result.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // Timeout to ensure the image is downloaded before opening Instagram
-    setTimeout(() => {
-      // Open Instagram stories URL
-      window.location.href = 'instagram://story-camera';
-
-      // Fallback for desktop or if Instagram app doesn't open
-      setTimeout(() => {
-        window.open('https://www.instagram.com/', '_blank');
-      }, 2000);
-    }, 500);
-  };
-
   return (
-    <div className="max-w-lg mx-auto bg-white-10 rounded-lg p-6 shadow-lg">
+    <div id="result-container" className="max-w-lg mx-auto bg-white rounded-lg p-6 shadow-lg">
       <div className="text-center">
         {/* Title with text stroke effect */}
         <h1 className="text-3xl font-bold text-primary mb-3 relative drop-shadow-xl">
@@ -525,11 +472,11 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
           다시 검사하기
         </button>
         <button
-          onClick={shareToInstagram}
+          onClick={handleShare}
           disabled={isSharing}
           className="px-6 py-2 font-light  text-xs bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
         >
-          {isSharing ? '생성 중...' : '결과 공유하기'}
+          {isSharing ? '저장 중...' : '결과 공유하기'}
         </button>
       </div>
 

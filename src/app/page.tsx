@@ -69,7 +69,6 @@ export default function Home() {
         <h2 className="text-l font-bold mb-6 bg-primary p-6 rounded-lg text-black whitespace-pre-line break-words">
           {currentQ.question}
         </h2>
-        <div className="absolute h-2 w-2 bg-primary rotate-45 -bottom-1 left-1/2 transform -translate-x-1/2"></div>
 
         <div className="space-y-5">
           {currentQ.options.map((option, index) => (
