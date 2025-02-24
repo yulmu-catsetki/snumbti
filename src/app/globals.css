@@ -50,3 +50,25 @@ body {
   font-weight: normal;
   font-style: normal;
 }
+
+.whitespace-pre-line {
+  white-space: pre-line;
+}
+
+.break-words {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@keyframes customBounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-bounce {
+  animation: customBounce 0.3s ease-in-out;
+}

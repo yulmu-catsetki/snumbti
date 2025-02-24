@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
-
+import html2canvas from 'html2canvas';
 export interface ClubType {
   title: string;
   description: string;
@@ -189,7 +189,7 @@ export const clubTypes: Record<string, ClubType> = {
   },
   "ISTJ": {
     title: "관찰력 1등급",
-    description: "한번 시작한 일은 무조건 골장을 본다! 남다른 통찰력이 나의 무기",
+    description: "한번 시작한 일은 무조건 끝장을 본다! 남다른 통찰력이 나의 무기",
     recommendedClubs: [
       {
         name: "버들",
@@ -271,7 +271,7 @@ export const clubTypes: Record<string, ClubType> = {
       },
       {
         name: "배구부/라크로스부/스누민턴(배드민턴)/호바스(농구) 등",
-        description: "손재주가 좋다는 말을 많이 들어본 사람이라면?"
+        description: "소싯적 공놀이로 이름 날려 본 사람이라면?"
       }
     ]
   },
@@ -383,78 +383,156 @@ interface ResultsProps {
 
 export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
   const [isSharing, setIsSharing] = useState(false);
+  const resultRef = useRef<HTMLDivElement>(null);
   const result = clubTypes[mbtiResult];
 
   if (!result) {
     return <div className="text-center">결과를 분석중입니다...</div>;
   }
 
-  return (
-    <div className="max-w-lg mx-auto bg-white rounded-lg p-6 shadow-lg">
-      <div className="text-center mb-8">
-        {/* Title with text stroke effect */}
-        <h1 className="text-2xl font-bold mb-4 relative">
-          <span className="absolute inset-0 text-black blur-[1px]">나의 동아리 유형은?</span>
-          <span className="absolute inset-0 text-white blur-[0.5px]">나의 동아리 유형은?</span>
-          <span className="relative text-blue-400">나의 동아리 유형은?</span>
-        </h1>
+  const shareToInstagram = async () => {
+    if (!resultRef.current) return;
+    
+    try {
+      setIsSharing(true);
+      
+      // Get the result container
+      const resultElement = resultRef.current;
+      
+      // Use html2canvas to convert the div to a canvas
+      const canvas = await html2canvas(resultElement, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true, // Allow cross-origin images
+        allowTaint: true,
+        backgroundColor: "#ffffff"
+      });
+      
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob as Blob);
+        }, 'image/png', 1.0);
+      });
+      
+      // Create a file from the blob
+      const file = new File([blob], 'mbti-result.png', { type: 'image/png' });
+      
+      // Create a FileReader to get the data URL
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
         
+        // For mobile devices, attempt to use Web Share API if available
+        if (navigator.share) {
+          navigator.share({
+            files: [file],
+            title: '나의 동아리 유형은?',
+            text: `나는 ${result.title} 유형이에요!`
+          }).catch(error => {
+            console.error('Error sharing', error);
+            // Fallback to Instagram direct link
+            openInstagram(dataUrl);
+          });
+        } else {
+          // Fallback to Instagram direct link
+          openInstagram(dataUrl);
+        }
+        
+        setIsSharing(false);
+      };
+    } catch (error) {
+      console.error('Error generating image:', error);
+      setIsSharing(false);
+    }
+  };
+  
+  // Function to open Instagram with the image
+  const openInstagram = (dataUrl: string) => {
+    // Create a temporary link to download the image (some mobile browsers need this step)
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = 'mbti-result.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Timeout to ensure the image is downloaded before opening Instagram
+    setTimeout(() => {
+      // Open Instagram stories URL
+      window.location.href = 'instagram://story-camera';
+      
+      // Fallback for desktop or if Instagram app doesn't open
+      setTimeout(() => {
+        window.open('https://www.instagram.com/', '_blank');
+      }, 2000);
+    }, 500);
+  };
+
+  return (
+    <div className="max-w-lg mx-auto bg-white-10 rounded-lg p-6 shadow-lg">
+      <div className="text-center">
+        {/* Title with text stroke effect */}
+        <h1 className="text-3xl font-bold text-primary mb-3 relative drop-shadow-xl">
+          {/* White border effect using text-shadow */}
+          <span className="leading-tight inline-block relative"
+            style={{
+              textShadow: '-2px -2px 0 white, 2px -2px 0 white, -2px 2px 0 white, 2px 2px 0 white'
+            }}
+          >
+            나의 동아리 유형은?
+          </span>
+        </h1>
         {/* Image container with brown border */}
-        <div className="border-2 border-[#998675] rounded-lg p-3 mx-auto mb-4 max-w-xs">
-          <div className="relative aspect-square w-full overflow-hidden mb-3">
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-              {/* Image placeholder - replace with your actual image component */}
-              <div className="relative w-full">
-                <Image 
-                  src={`/img/동아리 mbti_${mbtiResult.toLowerCase()}.png`}
-                  fill
-                  alt={result.title}
-                  className="object-cover"
-                  priority
-                />
-              </div>
+        <div className="border-4 border-secondary rounded-lg mx-auto mb-4 max-w-xs">
+        <h2 className="text-xl font-light bg-secondary p-2">{result.title}</h2>
+        <div className='p-3'>
+
+          <div className="mx-auto mb-4 w-48 h-48">
+            <div className="w-full h-full relative">
+              <Image
+                src={`/img/동아리 mbti_${mbtiResult.toLowerCase()}.png`}
+                alt={result.title}
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
           </div>
-          
-          {/* Description inside the brown bordered box */}
-          <p className="text-gray-700 text-sm px-2">
+  
+          <p className="text-gray-700 font-light text-sm px-2">
             {result.description}
-          </p>
+          </p>   
+          </div>   
         </div>
-        
-        <h2 className="text-lg text-blue-500 mb-2">{result.title}</h2>
       </div>
 
-      <div className="mb-8">
-        <h3 className="font-semibold mb-3">추천 동아리</h3>
-        <ul className="space-y-2">
+        <h3 className="font-bold text-center bg-primary p-2 rounded-xl">서울대 동아리 추천 리스트</h3>
+        <ul className="space-y-1 mt-2">
           {result.recommendedClubs.map((club, index) => (
-            <li key={index} className="bg-blue-50 p-3 rounded-lg">
-              <div className="text-blue-800 font-medium">{club.name}</div>
-              <div className="text-gray-600 text-sm mt-1">{club.description}</div>
+            <li key={index} className="bg-blue-50 p-1 border-primary border-4 rounded-lg font-light">
+              <div className="text-gray-600 text-xs mt-1">{club.description}</div>
+              <div className="text-blue-800 text-sm">{club.name}</div>
             </li>
           ))}
         </ul>
-      </div>
 
-      <div className="flex justify-center space-x-4">
+      <div className="flex justify-center space-x-4 mt-4">
         <button
           onClick={onRetry}
-          className="px-6 py-2 bg-blue-100 text-blue-500 rounded-lg hover:bg-blue-200 transition-colors"
+          className="px-6 py-2 font-light bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
         >
           다시 검사하기
         </button>
         <button
           onClick={() => setIsSharing(true)}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          className="px-6 py-2 font-light bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
         >
           결과 공유하기
         </button>
       </div>
 
-      <div className="mt-4 text-center text-sm text-gray-500">
-        @snu.official
-      </div>
+      <div className="mt-4 text-center font-light text-sm text-gray-500">@snu.official</div>
     </div>
   );
 };
