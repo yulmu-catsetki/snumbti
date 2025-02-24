@@ -392,13 +392,13 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
 
   const shareToInstagram = async () => {
     if (!resultRef.current) return;
-    
+
     try {
       setIsSharing(true);
-      
+
       // Get the result container
       const resultElement = resultRef.current;
-      
+
       // Use html2canvas to convert the div to a canvas
       const canvas = await html2canvas(resultElement, {
         scale: 2, // Higher scale for better quality
@@ -406,23 +406,23 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
         allowTaint: true,
         backgroundColor: "#ffffff"
       });
-      
+
       // Convert canvas to blob
       const blob = await new Promise<Blob>((resolve) => {
         canvas.toBlob((blob) => {
           resolve(blob as Blob);
         }, 'image/png', 1.0);
       });
-      
+
       // Create a file from the blob
       const file = new File([blob], 'mbti-result.png', { type: 'image/png' });
-      
+
       // Create a FileReader to get the data URL
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onloadend = () => {
         const dataUrl = reader.result as string;
-        
+
         // For mobile devices, attempt to use Web Share API if available
         if (navigator.share) {
           navigator.share({
@@ -438,7 +438,7 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
           // Fallback to Instagram direct link
           openInstagram(dataUrl);
         }
-        
+
         setIsSharing(false);
       };
     } catch (error) {
@@ -446,7 +446,7 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
       setIsSharing(false);
     }
   };
-  
+
   // Function to open Instagram with the image
   const openInstagram = (dataUrl: string) => {
     // Create a temporary link to download the image (some mobile browsers need this step)
@@ -456,12 +456,12 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     // Timeout to ensure the image is downloaded before opening Instagram
     setTimeout(() => {
       // Open Instagram stories URL
       window.location.href = 'instagram://story-camera';
-      
+
       // Fallback for desktop or if Instagram app doesn't open
       setTimeout(() => {
         window.open('https://www.instagram.com/', '_blank');
@@ -485,50 +485,51 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
         </h1>
         {/* Image container with brown border */}
         <div className="border-4 border-secondary rounded-lg mx-auto mb-4 max-w-xs">
-        <h2 className="text-xl font-light bg-secondary p-2">{result.title}</h2>
-        <div className='p-3'>
+          <h2 className="text-xl font-light bg-secondary p-2">{result.title}</h2>
+          <div className='p-3'>
 
-          <div className="mx-auto mb-4 w-48 h-48">
-            <div className="w-full h-full relative">
-              <Image
-                src={`/img/동아리 mbti_${mbtiResult.toLowerCase()}.png`}
-                alt={result.title}
-                fill
-                className="object-contain"
-                priority
-              />
+            <div className="mx-auto mb-4 w-48 h-48">
+              <div className="w-full h-full relative">
+                <Image
+                  src={`/img/동아리 mbti_${mbtiResult.toLowerCase()}.png`}
+                  alt={result.title}
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </div>
+
+            <p className="text-gray-700 font-light text-sm px-2">
+              {result.description}
+            </p>
           </div>
-  
-          <p className="text-gray-700 font-light text-sm px-2">
-            {result.description}
-          </p>   
-          </div>   
         </div>
       </div>
 
-        <h3 className="font-bold text-center bg-primary p-2 rounded-xl">서울대 동아리 추천 리스트</h3>
-        <ul className="space-y-1 mt-2">
-          {result.recommendedClubs.map((club, index) => (
-            <li key={index} className="bg-blue-50 p-1 border-primary border-4 rounded-lg font-light">
-              <div className="text-gray-600 text-xs mt-1">{club.description}</div>
-              <div className="text-blue-800 text-sm">{club.name}</div>
-            </li>
-          ))}
-        </ul>
+      <h3 className="font-bold text-center bg-primary p-2 rounded-xl">서울대 동아리 추천 리스트</h3>
+      <ul className="space-y-1 mt-2">
+        {result.recommendedClubs.map((club, index) => (
+          <li key={index} className="bg-blue-50 p-1 border-primary border-4 rounded-lg font-light">
+            <div className="text-gray-600 text-xs mt-1">{club.description}</div>
+            <div className="text-blue-800 text-sm">{club.name}</div>
+          </li>
+        ))}
+      </ul>
 
       <div className="flex justify-center space-x-4 mt-4">
         <button
           onClick={onRetry}
-          className="px-6 py-2 font-light bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
+          className="px-6 py-2 font-light text-xs bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
         >
           다시 검사하기
         </button>
         <button
-          onClick={() => setIsSharing(true)}
-          className="px-6 py-2 font-light bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
+          onClick={shareToInstagram}
+          disabled={isSharing}
+          className="px-6 py-2 font-light  text-xs bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
         >
-          결과 공유하기
+          {isSharing ? '생성 중...' : '결과 공유하기'}
         </button>
       </div>
 
