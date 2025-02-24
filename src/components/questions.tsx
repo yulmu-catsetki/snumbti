@@ -5,7 +5,7 @@ export interface Question {
   question: string;
   options: {
     text: string;
-    type: string;  // E/I, N/S, T/F, J/P
+    type: string;  // E/I, N/S, T/F, J/P, or SNU
   }[];
 }
 
@@ -38,7 +38,7 @@ export const questions: Question[] = [
       },
       {
         text: "난 애교><심(愛校心)이 넘쳐나니까 서울대를 위한 활동이면 좋겠다!",
-        type: "F"
+        type: "SNU"
       }
     ]
   },
@@ -61,7 +61,7 @@ export const questions: Question[] = [
     question: "취미를 즐길 때 나의 모습은?",
     options: [
       {
-        text: "여기 와서 내가 한 것 좀 봐봐!!! 이 재밌는 걸 모른다고???!!! 이리 와. 당장 나랑 함께 시작해",
+        text: "여기 와서 내가 한 것 좀 봐봐!!! 이 재밌는 걸 모른다고???!!?!?? 이리 와, 당장 나랑 함께 시작해",
         type: "E"
       },
       {
@@ -70,7 +70,7 @@ export const questions: Question[] = [
       },
       {
         text: "내 취미는 서울대 하.나.뿐. 세상 사람들에게 우리 아기(서울대) 예쁜 거 알려야 해",
-        type: "P"
+        type: "SNU"
       }
       
     ]
@@ -80,7 +80,7 @@ export const questions: Question[] = [
     question: "동아리 결과물을 대하는 태도는?",
     options: [
       {
-        text: "비록 동아리 활동이라도 뭔가 남는 게 있어야만 해!",
+        text: "비록 동아리 활동이라도 무언가 남는 건 있어야만 해!",
         type: "J"
       },
       {
@@ -88,8 +88,8 @@ export const questions: Question[] = [
         type: "P"
       },
       {
-        text: "스누 오피셜에 내 콘텐츠를 올릴 수만 있다면... 별이라도 따올 수 있어",
-        type: "P"
+        text: "스누오피셜에 내 콘텐츠를 올릴 수만 있다면... 별이라도 따올 수 있어",
+        type: "SNU"
       }
     ]
   },
@@ -126,7 +126,7 @@ export const questions: Question[] = [
     question: "동아리 OT에서 사람들과 어울리는 방법은?",
     options: [
       {
-        text: "헐! 이 사람 뭐지? 너무 재밌다! 어머! 저 테이블 재밌어보이는데? 엉덩이 붙일 틈도 없이 마구 돌아다닌다",
+        text: "헐! 이 사람 뭐지? 너무 재밌다! 어머! 저 테이블 재밌어 보이는데? 엉덩이 붙일 틈도 없이 마구 돌아다닌다",
         type: "E"
       },
       {
@@ -140,7 +140,7 @@ export const questions: Question[] = [
     question: "동아리 첫 회의 직전, 나의 다짐!",
     options: [
       {
-        text: "창의적인 아이디어를 마구 내봐야지!!! 나의 잠재력을 탐구하는 시간이 되길 ><",
+        text: "창의적인 아이디어를 마구 내봐야지! 나의 잠재력을 탐구하는 시간이 되길 ><",
         type: "N"
       },
       {
@@ -160,12 +160,50 @@ export const questions: Question[] = [
       {
         text: "대가 끊기지 않고 잘 굴러가기만 하면 다행이야~",
         type: "T"
+      },
+      {
+        text: "스누오피셜이 세계 대학 SNS 팔로워 수 1위가 되는 그날까지, 이 한 몸 바치리라",
+        type: "SNU"
+      }
+    ]
+  },
+  {
+    id: 11,
+    question: "동아리장에게 갑자기 카톡이 왔다. - 이번 주 회의는 비대면으로 해도 될까?",
+    options: [
+      {
+        text: "뭐...? 직접 만나서 의견을 공유하고 교류하는 게 동아리의 묘미 아니야? 난 인정 못해. 다들 가능한 날짜로 바꾸자",
+        type: "E"
+      },
+      {
+        text: "무르지 못하도록 칼답한다 넵!!!! (침대에 누워 있는 채로)",
+        type: "I"
+      }
+    ]
+  },
+  {
+    id: 12,
+    question: "한 학기 동안 준비한 프로젝트가 끝났다!",
+    options: [
+      {
+        text: "지금까지 함께했던 부원들... 힘겨웠던 시간들... 감동의 쓰나미가 몰려온다",
+        type: "F"
+      },
+      {
+        text: "휴~! 이렇게 또 하나의 과업이 끝났군^^ 뿌듯뿌듯",
+        type: "T"
       }
     ]
   }
 ];
 
 export const calculateResult = (answers: string[]): string => {
+  // Count SNU responses
+  const snuCount = answers.filter(answer => answer === "SNU").length;
+  if (snuCount >= 3) {
+    return "기자단";
+  }
+
   const counts = {
     E: 0, I: 0,
     N: 0, S: 0,
@@ -174,7 +212,9 @@ export const calculateResult = (answers: string[]): string => {
   };
   
   answers.forEach(answer => {
-    counts[answer as keyof typeof counts]++;
+    if (answer !== "SNU" && answer in counts) {
+      counts[answer as keyof typeof counts]++;
+    }
   });
   
   return [
