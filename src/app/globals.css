@@ -19,3 +19,34 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.moving-dots {
+  background-color: #f0f9ff;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23BFE3FC' fill-opacity='0.6'%3E%3Cpath d='M20 20c0-2.8 2.2-5 5-5s5 2.2 5 5c0 1.9-1.1 3.6-2.7 4.4C26.1 25.1 25 26.7 25 28.5V31h-2v-2.5c0-2.3 1.3-4.3 3.2-5.3.8-.4 1.3-1.2 1.3-2.2 0-1.4-1.1-2.5-2.5-2.5S22.5 19.6 22.5 21h-2.5zm3.5 14h2v2h-2v-2z'/%3E%3Cpath d='M55 20c-2.2 0-4 1.8-4 4 0 1.1.4 2.1 1.2 2.8.8.7 1.3 1.7 1.3 2.7v1h3v-1c0-1-.5-2-1.3-2.7-.8-.7-1.2-1.7-1.2-2.8 0-.6.4-1 1-1s1 .4 1 1h3c0-2.2-1.8-4-4-4zm-1.5 12h3v3h-3v-3z' transform='translate(0 40)'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 80px 80px;
+  animation: movePattern 12s linear infinite;
+}
+
+@keyframes movePattern {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -80px 80px;
+  }
+}
+
+
+@font-face {
+  font-family: 'DNFBitBit';
+  src: url('/fonts/DNFBitBitv2.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Moneygraphy';
+  src: url('/fonts/Moneygraphy-Pixel.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
