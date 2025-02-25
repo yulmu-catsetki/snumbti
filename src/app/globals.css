@@ -51,14 +51,6 @@ body {
   font-style: normal;
 }
 
-.whitespace-pre-line {
-  white-space: pre-line;
-}
-
-.break-words {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
 
 @keyframes customBounce {
   0%, 100% {

@@ -1,11 +1,10 @@
-// page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { questions, calculateResult } from "@/components/questions";
 import { Results } from "@/components/results";
 import dynamic from 'next/dynamic';
-// Dynamically import the Rive component to avoid SSR issues
+
 const RiveLandingPage = dynamic(
   () => import('@/components/RiveLandingPage').then(mod => mod.default),
   { ssr: false }
@@ -24,17 +23,15 @@ export default function Home() {
   };
 
   const handleAnswer = (type: string, index: number) => {
-    // Set the clicked button index to trigger the animation
     setClickedButtonIndex(index);
     
-    // Delay the next action to allow the animation to complete
     setTimeout(() => {
       const newAnswers = [...answers, type];
       setAnswers(newAnswers);
 
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
-        setClickedButtonIndex(null); // Reset clicked button state
+        setClickedButtonIndex(null);
       } else {
         setShowResult(true);
       }
@@ -66,7 +63,7 @@ export default function Home() {
   return (
     <div className="moving-dots min-h-screen bg-blue-50 flex items-center justify-center p-4">
       <div className="max-w-lg w-full bg-white rounded-lg p-6 shadow-lg">
-        <h2 className="text-l font-bold mb-6 bg-primary p-6 rounded-lg text-black whitespace-pre-line break-words">
+        <h2 className="text-l font-bold mb-6 bg-primary p-6 rounded-lg text-black text-pretty">
           {currentQ.question}
         </h2>
 
@@ -75,7 +72,7 @@ export default function Home() {
             <button
               key={index}
               onClick={() => handleAnswer(option.type, index)}
-              className={`w-full whitespace-pre-line break-words font-light text-left p-4 border-4 border-secondary rounded-lg text-secondary transition-transform duration-300 ${
+              className={`w-full font-light p-4 border-4 border-secondary rounded-lg text-secondary transition-transform duration-300 text-pretty ${
                 clickedButtonIndex === index ? "animate-bounce" : ""
               }`}
             >
