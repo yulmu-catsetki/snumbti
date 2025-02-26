@@ -1,6 +1,6 @@
 import React, { useState,useEffect, useRef } from 'react';
 import Image from 'next/image';
-
+import LoadingSpinner from './LoadingSpinner';
 
 export interface ClubType {
   title: string;
@@ -384,7 +384,20 @@ interface ResultsProps {
 
 export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
   const [isSharing, setIsSharing] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isResultReady, setIsResultReady] = useState(false);
   const result = clubTypes[mbtiResult];
+
+  // Add a loading phase when results are calculated
+  useEffect(() => {
+    // Simulate loading time to make sure the transition feels natural
+    const timer = setTimeout(() => {
+      setIsResultReady(true);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleShare = async () => {
     setIsSharing(true);
     
@@ -416,6 +429,22 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
       setIsSharing(false);
     }
   };
+
+  if (!isResultReady) {
+    return (
+      <div className="moving-dots min-h-screen bg-blue-50 flex items-center justify-center p-4">
+        <div className="max-w-lg w-full bg-white rounded-lg p-6 shadow-lg flex flex-col items-center justify-center" style={{ minHeight: "60vh" }}>
+          <div className="mb-6">
+            <LoadingSpinner />
+          </div>
+          <p className="text-center font-light text-gray-600">
+            당신의 동아리 유형을 분석 중입니다...
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div id="result-container" className="max-w-lg mx-auto bg-white rounded-lg p-6 shadow-lg">
       <div className="text-center">
@@ -434,8 +463,12 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
         <div className="border-4 border-secondary rounded-lg mx-auto mb-4 max-w-xs">
           <h2 className="text-xl font-light bg-secondary p-2">{result.title}</h2>
           <div className='p-3'>
-
-            <div className="mx-auto mb-4 w-48 h-48">
+            {!isImageLoaded && (
+              <div className="w-48 h-48 mx-auto flex items-center justify-center">
+                <LoadingSpinner />
+              </div>
+            )}
+            <div className={`mx-auto mb-4 w-48 h-48 ${isImageLoaded ? '' : 'hidden'}`}>
               <div className="w-full h-full relative">
                 <Image
                   src={`/img/동아리 mbti_${mbtiResult.toLowerCase()}.png`}
@@ -443,6 +476,7 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
                   fill
                   className="object-contain"
                   priority
+                  onLoadingComplete={() => setIsImageLoaded(true)}
                 />
               </div>
             </div>
@@ -473,8 +507,10 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
         </button>
         <button
           onClick={handleShare}
-          disabled={isSharing}
-          className="px-6 py-2 font-light  text-xs bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
+          disabled={isSharing || !isImageLoaded}
+          className={`px-6 py-2 font-light text-xs bg-primary text-white rounded-lg ${
+            isSharing || !isImageLoaded ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-200 transition-colors'
+          }`}
         >
           {isSharing ? '저장 중...' : '이미지 저장하기'}
         </button>
