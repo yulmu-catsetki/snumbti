@@ -380,13 +380,31 @@ export const clubTypes: Record<string, ClubType> = {
 interface ResultsProps {
   mbtiResult: string;
   onRetry: () => void;
+  snuCount?: number;
 }
 
-export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
+export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry, snuCount = 0 }) => {
   const [isSharing, setIsSharing] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isBonusImageLoaded, setIsBonusImageLoaded] = useState(false);
   const [isResultReady, setIsResultReady] = useState(false);
   const result = clubTypes[mbtiResult];
+  const showBonusImage = snuCount >= 3;
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if the device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent;
+      const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      setIsMobile(mobileRegex.test(userAgent));
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Add a loading phase when results are calculated
   useEffect(() => {
@@ -405,28 +423,59 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
       // Define the image URL based on the MBTI result
       const imageUrl = `/img/result/결과_${mbtiResult.toLowerCase()}.png`;
       
-      // Create a link element to trigger the download
-      const link = document.createElement('a');
-      link.href = imageUrl;
-      link.download = `서울대_동아리_MBTI.png`;
-      document.body.appendChild(link);
-      
-      // Trigger the download
-      link.click();
-      
-      // Clean up the link element
-      document.body.removeChild(link);
-      
-      // Short delay before opening Instagram
-      setTimeout(() => {
-        // Open Instagram
-        window.open('https://www.instagram.com/create/story', '_blank');
+      if (isMobile) {
+        // Mobile flow: fetch the image, save it, then open Instagram
+        fetch(imageUrl)
+          .then(response => response.blob())
+          .then(blob => {
+            // Create object URL for the image blob
+            const blobUrl = URL.createObjectURL(blob);
+            
+            // Create a link element to trigger the download
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `서울대_동아리_MBTI_${mbtiResult}.png`;
+            document.body.appendChild(link);
+            
+            // Trigger the download
+            link.click();
+            
+            // Clean up
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+            
+            // Short delay before opening Instagram
+            setTimeout(() => {
+              window.open('https://www.instagram.com/create/story', '_blank');
+              setIsSharing(false);
+            }, 1000);
+          })
+          .catch(error => {
+            console.error('Error downloading image:', error);
+            setIsSharing(false);
+          });
+      } else {
+        // Desktop flow: create a download link with proper attributes
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = `서울대_동아리_MBTI_${mbtiResult}.png`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        
+        // Trigger the download
+        link.click();
+        
+        // Clean up
+        document.body.removeChild(link);
         setIsSharing(false);
-      }, 500);
-      
+      }
     } catch (error) {
       console.error('Error sharing result:', error);
       setIsSharing(false);
+      
+      // Fallback method if the above fails
+      alert('이미지 저장에 실패했습니다. 화면을 캡쳐해주세요');
     }
   };
 
@@ -516,6 +565,52 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
         </button>
       </div>
 
+      {/* Bonus image for SNU enthusiasts */}
+      {showBonusImage && (
+        <div className="mt-6 border-2 border-dashed border-primary p-3 rounded-lg ">
+          <h4 className="text-center text-lg font-bold text-primary mb-2 animate-pulse">💫 히든 답변에 반응한 당신 💫</h4>
+          <div className="relative w-full" style={{ height: "200px" }}>
+            {!isBonusImageLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <LoadingSpinner />
+              </div>
+            )}
+            <Image 
+              src="/img/동아리 mbti_기자단.png"
+              alt="보너스 이미지"
+              className={`object-contain rounded-lg ${isBonusImageLoaded ? '' : 'opacity-0'}`}
+              fill
+              onLoadingComplete={() => setIsBonusImageLoaded(true)}
+            />
+          </div>
+          <p className=" font-light text-center text-blue-800">
+            학생기자단/영상기자단과 찰떡궁합입니다!
+          </p>
+          <p className=" font-light text-xs text-gray-500 mt-2">
+            국문 및 영문기자 : 서울대학교 공식 매체의 기사 취재 및 작성
+            <br />
+            SNS기자 : 서울대학교 공식 인스타그램의 콘텐츠 기획 및 제작
+            <br />
+            영상기자 : 서울대학교 공식 매체의 영상 기획 및 제작 
+          </p>
+          <p className=" font-bold text-center text-blue-800 mt-4">
+            2025-1 신규 기자단원
+            <br />
+            3월 9일까지 절찬 모집 중!!!🎉
+          </p>
+          <div className="flex justify-center mt-3">
+            <a 
+              href="https://www.instagram.com/p/DF7SP3fy3PN/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-bold"
+            >
+              더 많은 정보
+            </a>
+          </div>
+        </div>
+      )}
+      
       <div className="mt-4 text-center font-light text-sm text-gray-500">@snu.official</div>
     </div>
   );

@@ -199,13 +199,10 @@ export const questions: Question[] = [
   }
 ];
 
-export const calculateResult = (answers: string[]): string => {
+export const calculateResult = (answers: string[]): {mbtiType: string, snuCount: number} => {
   // Count SNU responses
   const snuCount = answers.filter(answer => answer === "SNU").length;
-  if (snuCount >= 3) {
-    return "기자단";
-  }
-
+  
   const counts = {
     E: 0, I: 0,
     N: 0, S: 0,
@@ -219,10 +216,15 @@ export const calculateResult = (answers: string[]): string => {
     }
   });
   
-  return [
+  const mbtiType = [
     counts.E > counts.I ? 'E' : 'I',
     counts.N > counts.S ? 'N' : 'S',
     counts.T > counts.F ? 'T' : 'F',
     counts.J > counts.P ? 'J' : 'P'
   ].join('');
+  
+  return {
+    mbtiType,
+    snuCount
+  };
 };

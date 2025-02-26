@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { questions, calculateResult } from "@/components/questions";
 import { Results } from "@/components/results";
 import dynamic from 'next/dynamic';
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const RiveLandingPage = dynamic(
   () => import('@/components/RiveLandingPage').then(mod => mod.default),
@@ -95,6 +96,7 @@ export default function Home() {
   const [clickedButtonIndex, setClickedButtonIndex] = useState<number | null>(null);
   const [typingComplete, setTypingComplete] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleStart = () => {
     setStarted(true);
@@ -113,7 +115,14 @@ export default function Home() {
         setTypingComplete(false);
         setShowOptions(false);
       } else {
-        setShowResult(true);
+        // Start transition to results
+        setIsTransitioning(true);
+        
+        // Short delay before showing results to allow for animation
+        setTimeout(() => {
+          setShowResult(true);
+          setIsTransitioning(false);
+        }, 1000);
       }
     }, 300); // Match this with the animation duration
   };
@@ -134,6 +143,7 @@ export default function Home() {
     setClickedButtonIndex(null);
     setTypingComplete(false);
     setShowOptions(false);
+    setIsTransitioning(false);
   };
 
   // 새 질문이 로드될 때마다 상태 초기화
@@ -146,10 +156,28 @@ export default function Home() {
     return <RiveLandingPage onStart={handleStart} />;
   }
 
-  if (showResult) {
+  if (isTransitioning) {
     return (
       <div className="moving-dots min-h-screen bg-blue-50 flex items-center justify-center p-4">
-        <Results mbtiResult={calculateResult(answers)} onRetry={handleRetry} />
+        <div className="max-w-lg w-full bg-white rounded-lg p-6 shadow-lg flex flex-col items-center justify-center min-h-64">
+          <LoadingSpinner />
+          <p className="mt-4 text-gray-600 font-light text-center">
+            당신의 동아리 유형을 분석 중입니다...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (showResult) {
+    const result = calculateResult(answers);
+    return (
+      <div className="moving-dots min-h-screen bg-blue-50 flex items-center justify-center p-4">
+        <Results 
+          mbtiResult={result.mbtiType} 
+          snuCount={result.snuCount}
+          onRetry={handleRetry} 
+        />
       </div>
     );
   }
