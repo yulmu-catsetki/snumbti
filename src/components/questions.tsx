@@ -88,7 +88,7 @@ export const questions: Question[] = [
         type: "P"
       },
       {
-        text: "스누오피셜에 내 콘텐츠를 올릴 수만 있다면... 별이라도 따올 수 있어",
+        text: "널리 널리 알리고 싶어! 스누오피셜이나 학교 홈페이지에 올릴 수만 있다면 최고일 텐데...",
         type: "SNU"
       }
     ]
@@ -102,7 +102,7 @@ export const questions: Question[] = [
         type: "N"
       },
       {
-        text: "수십년간 이어온 전통이 있는 동아리. 아름다워. 사랑해.",
+        text: "수십 년간 이어온 전통이 있는 동아리. 아름다워. 사랑해.",
         type: "S"
       }
     ]
@@ -162,7 +162,7 @@ export const questions: Question[] = [
         type: "T"
       },
       {
-        text: "스누오피셜이 세계 대학 SNS 팔로워 수 1위가 되는 그날까지, 이 한 몸 바치리라",
+        text: "관악을 넘어 세계인이 우리 단체를 알게 됐으면 좋겠어! 일단 SNS 팔로워 수부터 정점을 찍는 거야",
         type: "SNU"
       }
     ]

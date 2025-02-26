@@ -117,17 +117,17 @@ export const clubTypes: Record<string, ClubType> = {
         description: "방학에 교육봉사 캠프를 떠나고 싶다면?"
       },
       {
-        name: "글로벌사회공헌단/GIV/AIESEC",
+        name: "글로벌사회공헌단/GIV/AIESEC 등",
         description: "해외봉사에 관심이 있다면?"
       }
     ]
   },
   "INFP": {
     title: "아이디어 뱅크",
-    description: "말랑말랑한 두뇌에 넘쳐흐르는 상상력 지금까지 공유해왔던 스토리만 천만 개!",
+    description: "말랑말랑한 두뇌에 넘쳐흐르는 상상력 지금까지 공유해왔던 스토리만 천만개!",
     recommendedClubs: [
       {
-        name: "총연극회/사회대연극당/리버엠트/경영극회/미대극회 등",
+        name: "총연극회/사회대연극당/리버액트/경영극회/미대극회 등",
         description: "함께할 연극단원을 찾는다면?"
       },
       {
@@ -259,7 +259,7 @@ export const clubTypes: Record<string, ClubType> = {
     description: "못 해본 운동은 있을지언정 못하는 운동 따윈 없다! 나는야 만능 엔터테이너",
     recommendedClubs: [
       {
-        name: "육상부/달리사/스누와드(크로스핏)/FOS(복싱부) 등",
+        name: "육상부/달리샤/스누와드(크로스핏)/FOS(복싱부) 등",
         description: "강인한 신체에 강인한 정신이 깃든다!"
       },
       {
@@ -325,7 +325,7 @@ export const clubTypes: Record<string, ClubType> = {
     description: "'그래 내가 리더가 될 관상인가?' 서울대생을 위한, 서울대생에 의한, 서울대를 만들고 싶어!",
     recommendedClubs: [
       {
-        name: "축제하는사람들/문화자치위원회",
+        name: "축제하는사람들/문화자치위원회 등",
         description: "서울대생들이 즐길 수 있는 문화행사를 주도하자!"
       },
       {
@@ -476,7 +476,7 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry }) => {
           disabled={isSharing}
           className="px-6 py-2 font-light  text-xs bg-primary text-white rounded-lg hover:bg-blue-200 transition-colors"
         >
-          {isSharing ? '저장 중...' : '결과 공유하기'}
+          {isSharing ? '저장 중...' : '이미지 저장하기'}
         </button>
       </div>
 
