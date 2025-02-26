@@ -20,7 +20,13 @@ export default {
           DEFAULT: "#998675",
           light: "#998675",
           dark: "#998675",
-        }
+        },
+        blue_accent:{
+          DEFAULT: "#456277",
+          light: "#456277",
+          dark: "#456277",
+        },
+
       },
       fontFamily: {
         'bold': ['DNFBitBit', 'sans-serif'],

@@ -9,6 +9,8 @@ export interface Question {
   }[];
 }
 
+
+
 export const questions: Question[] = [
   {
     id: 1,
@@ -140,7 +142,7 @@ export const questions: Question[] = [
     question: "동아리 첫 회의 직전, 나의 다짐!",
     options: [
       {
-        text: "창의적인 아이디어를 마구 내봐야지! 나의 잠재력을 탐구하는 시간이 되길 ><",
+        text: "창의적인 아이디어를 마구 내봐야지! 나의 잠재력을 탐구하는 시간이 되길><",
         type: "N"
       },
       {
