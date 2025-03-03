@@ -178,7 +178,7 @@ export const questions: Question[] = [
         type: "E"
       },
       {
-        text: "무르지 못하도록 칼답한다 넵!!!! (침대에 누워 있는 채로)",
+        text: "넵!!! (무르지 못하게 칼답한다)",
         type: "I"
       }
     ]
