@@ -443,59 +443,76 @@ export const Results: React.FC<ResultsProps> = ({
 
   const handleShare = async () => {
     setIsSharing(true);
-
+  
     try {
       // Define the image URL based on the MBTI result
       const imageUrl = `/img/result/결과_${mbtiResult.toLowerCase()}.png`;
-
+  
       if (isMobile) {
-        // Mobile flow: fetch the image, save it, then open Instagram
+        // Mobile flow: fetch the image, save it
         fetch(imageUrl)
           .then((response) => response.blob())
           .then((blob) => {
             // Create object URL for the image blob
             const blobUrl = URL.createObjectURL(blob);
-
+  
             // Create a link element to trigger the download
             const link = document.createElement("a");
             link.href = blobUrl;
             link.download = `서울대_동아리_MBTI_${mbtiResult}.png`;
             document.body.appendChild(link);
-
+  
             // Trigger the download
             link.click();
-
+  
             // Clean up
             document.body.removeChild(link);
             setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-
+  
+            // If the user wants to manually save, open the image in a new tab as backup
+            setTimeout(() => {
+              window.open(imageUrl, '_blank');
+              setIsSharing(false);
+            }, 1000);
           })
           .catch((error) => {
             console.error("Error downloading image:", error);
+            // Fallback: Open image in new tab for manual saving
+            window.open(imageUrl, '_blank');
             setIsSharing(false);
           });
       } else {
-        // Desktop flow: create a download link with proper attributes
-        const link = document.createElement("a");
-        link.href = imageUrl;
-        link.download = `서울대_동아리_MBTI_${mbtiResult}.png`;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        document.body.appendChild(link);
-
-        // Trigger the download
-        link.click();
-
-        // Clean up
-        document.body.removeChild(link);
-        setIsSharing(false);
+        // Desktop flow: try automatic download first
+        try {
+          const link = document.createElement("a");
+          link.href = imageUrl;
+          link.download = `서울대_동아리_MBTI_${mbtiResult}.png`;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          document.body.appendChild(link);
+  
+          // Trigger the download
+          link.click();
+  
+          // Clean up
+          document.body.removeChild(link);
+          
+          // Also open in new tab as backup after a short delay
+          setTimeout(() => {
+            window.open(imageUrl, '_blank');
+            setIsSharing(false);
+          }, 1000);
+        } catch (error) {
+          console.error("Download failed, opening direct image link:", error);
+          window.open(imageUrl, '_blank');
+          setIsSharing(false);
+        }
       }
     } catch (error) {
       console.error("Error sharing result:", error);
+      // Final fallback - open the image directly
+      window.open(`/img/result/결과_${mbtiResult.toLowerCase()}.png`, '_blank');
       setIsSharing(false);
-
-      // Fallback method if the above fails
-      alert("이미지 저장에 실패했습니다. 화면을 캡쳐해주세요");
     }
   };
 
