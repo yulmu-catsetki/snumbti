@@ -389,7 +389,7 @@ export const Results: React.FC<ResultsProps> = ({ mbtiResult, onRetry, snuCount 
   const [isBonusImageLoaded, setIsBonusImageLoaded] = useState(false);
   const [isResultReady, setIsResultReady] = useState(false);
   const result = clubTypes[mbtiResult];
-  const showBonusImage = snuCount >= 3;
+  const showBonusImage = snuCount >= 2;
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if the device is mobile
